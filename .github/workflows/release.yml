@@ -1,24 +1,23 @@
- name: Generate Release Notes
-     on:
-       push:
-         tags:
-           - "v*.*.*"
-     jobs:
-       generate_release_notes:
-         runs-on: ubuntu-latest
-         steps:
-           - name: Checkout Code
-             uses: actions/checkout@v2
-           - name: Generate Release Notes
-             uses: mikepenz/release-changelog-builder-action@v2
-             with:
-               configuration: .github/release-drafter.yml
-           - name: Create GitHub Release
-             uses: ncipollo/release-action@v1
-             with:
-               token: ${{ secrets.GITHUB_TOKEN }}
-               name: Release ${{ github.ref_name }}
-               tag_name: ${{ github.ref_name }}
-               files: |
-                 CHANGELOG.md
-                 RELEASE_NOTES.md
+# .github/workflows/release-drafter.yml
+name: "Release Drafter"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, edited, closed, reopened]
+  workflow_dispatch:
+
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Update Release Draft
+      uses: release-drafter/release-drafter@v5
+      with:
+        config-name: '.github/release-drafter.yml'
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASENOTEGENERATOR_TOKEN }}
